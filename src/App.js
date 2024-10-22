@@ -12,6 +12,7 @@ import SignUp from "./Components/Signup";
  import ProfilePage from "./Pages/ProfilePage";
  import PublishPage from "./Pages/PubishPage";
  import HistoryPage from "./Pages/HistoryPage";
+ 
 function App() {
   return (
     <Router>
