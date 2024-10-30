@@ -4,32 +4,29 @@ import { toast } from "react-toastify";
 
 export default function ProfilePage() {
     const [userData, setUserData] = useState({
-        firstName: '',
-        lastName: '',
+        fname: '',
+        lname: '',
         email: '',
         currentPassword: '',
         newPassword: ''
     });
 
-    // Fetch user details when the component mounts
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const token = localStorage.getItem('token'); // Retrieve token from localStorage
+                const token = localStorage.getItem('token'); 
 
                 if (token) {
                     const response = await axios.get('http://localhost:5000/api/users/me', {
                         headers: {
-                            'Authorization': `Bearer ${token}`  // Send token in Authorization header
+                            'Authorization': `Bearer ${token}`
                         }
                     });
-
-                    // Map API response to state
                     setUserData({
-                        firstName: response.data.fname,  // Adjust key names based on the API response
-                        lastName: response.data.lname,
+                        fname: response.data.fname,
+                        lname: response.data.lname,
                         email: response.data.email,
-                        currentPassword: '',  // These should be reset
+                        currentPassword: '',
                         newPassword: ''
                     });
                 } else {
@@ -43,7 +40,6 @@ export default function ProfilePage() {
         fetchUserDetails();
     }, []);
 
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUserData({
@@ -52,24 +48,35 @@ export default function ProfilePage() {
         });
     };
 
-    // Submit the form to update user details
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token'); // Retrieve the token
+        const token = localStorage.getItem('token');
 
         if (!token) {
             toast.error("No authorization token found. Please log in.");
             return;
         }
-
+        const payload = {
+            fname: userData.fname,
+            lname: userData.lname,
+            email: userData.email,
+        };
+        if (userData.currentPassword) {
+            payload.currentPassword = userData.currentPassword;
+        }
+        if (userData.newPassword) {
+            payload.newPassword = userData.newPassword;
+        }
         try {
-            await axios.put('http://localhost:5000/api/users/update', userData, {
+            const response = await axios.put('http://localhost:5000/api/users/update', userData, {
                 headers: {
-                    Authorization: `Bearer ${token}`  // Include token in update request
+                    Authorization: `Bearer ${token}`
                 }
             });
+            console.log("Response data:", response.data); // Check response data
             toast.success("User details updated successfully!");
         } catch (error) {
+            console.error("Error:", error.response?.data);
             toast.error(error.response?.data?.message || "Failed to update user details.");
         }
     };
@@ -85,10 +92,10 @@ export default function ProfilePage() {
                         </label>
                         <div className="mt-2">
                             <input
-                                id="first-name"
-                                name="firstName"
+                                id="fname"
+                                name="fname"
                                 type="text"
-                                value={userData.firstName}
+                                value={userData.fname}
                                 onChange={handleInputChange}
                                 className="block w-full rounded-md border-0 py-1.5 text-yellow-900 shadow-sm ring-1 ring-inset ring-yellow-300 placeholder:text-yellow-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
                             />
@@ -101,10 +108,10 @@ export default function ProfilePage() {
                         </label>
                         <div className="mt-2">
                             <input
-                                id="last-name"
-                                name="lastName"
+                                id="lname"
+                                name="lname"
                                 type="text"
-                                value={userData.lastName}
+                                value={userData.lname}
                                 onChange={handleInputChange}
                                 className="block w-full rounded-md border-0 py-1.5 text-yellow-900 shadow-sm ring-1 ring-inset ring-yellow-300 placeholder:text-yellow-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
                             />
@@ -164,9 +171,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className="mt-6 flex items-center justify-end gap-x-6">
-                    <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-                        Cancel
-                    </button>
+                   
                     <button
                         type="submit"
                         className="rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
