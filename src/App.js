@@ -12,7 +12,7 @@ import SignUp from "./Components/Signup";
  import ProfilePage from "./Pages/ProfilePage";
  import PublishPage from "./Pages/PubishPage";
  import HistoryPage from "./Pages/HistoryPage";
- 
+ import Review_ratings from './Components/ReviewRatings'
 function App() {
   return (
     <Router>
@@ -29,6 +29,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} /> 
           <Route path="/publish" element={<PublishPage/>}/>
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/review_rating" element={<Review_ratings/>}/>
 
         </Routes>
         <Footer />

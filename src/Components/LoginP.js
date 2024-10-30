@@ -5,41 +5,64 @@ import loginpage from '../Assets/loginpage.jpg';
 import Logo from '../Assets/Logo.png';  
 import axios from 'axios';  
 import { ToastContainer, toast } from 'react-toastify';  
-import 'react-toastify/dist/ReactToastify.css';  
+import 'react-toastify/dist/ReactToastify.css'; 
+import Navbar from './Navbar' 
 
-const LoginP = () => {  
-    const { login } = useContext(AuthContext);   
-    const [formData, setFormData] = useState({ email: '', password: '' });  
-    const navigate = useNavigate();   
+const LoginP = () => {
+    const { login } = useContext(AuthContext); // Assuming you have an AuthContext
+    const [formData, setFormData] = useState({ email: '', password: '' });
+    const navigate = useNavigate();
 
-    const handleChange = (e) => {  
-        setFormData({  
-            ...formData,  
-            [e.target.id]: e.target.value  
-        });  
-    };  
+    // Handle input field changes
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.id]: e.target.value
+        });
+    };
+
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          const response = await axios.post('http://localhost:5000/api/users/login', formData);
-          console.log(response); // Add this to check if the response is as expected
-      
-          if (response.status === 200) {
-            login();   
-            toast.success('Login Successful!'); // Success toast
-            navigate('/'); 
-          } else {
-            toast.error("Unexpected response from server!"); 
-          }
+            // Make login request to the backend
+            const response = await axios.post('http://localhost:5000/api/users/login', formData);
+
+            console.log(response); // Check the response in the console
+
+            // Check if login was successful (HTTP status 200)
+            if (response.status === 200) {
+                // Extract token and user details
+                const { token, user } = response.data;
+
+                // Save token and user details to localStorage
+                localStorage.setItem('token', token);
+                localStorage.setItem('fname', user.fname);
+                localStorage.setItem('lname', user.lname);
+                localStorage.setItem('email', user.email);
+
+                // Call the login function from AuthContext
+                login();
+
+                // Show success message
+                toast.success('Login Successful!');
+
+                navigate('/');
+            } else {
+                toast.error("Unexpected response from server!");
+            }
         } catch (error) {
-          console.error(error);
-          toast.error(error.response?.data?.message || "Login failed!"); // Error toast
+            console.error(error);
+
+            // Show error message from server if available, else show default error
+            toast.error(error.response?.data?.message || "Login failed!");
         }
-      };
+    };
        
 
-    return (  
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">  
+    return (  <>
+        <Navbar/>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900"> 
             <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">  
                 <div className="hidden bg-cover lg:block lg:w-1/2" style={{ backgroundImage: `url(${loginpage})` }}></div>  
                 <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">  
@@ -97,7 +120,7 @@ const LoginP = () => {
                 draggable   
                 pauseOnHover   
             />  
-        </div>  
+        </div>  </>
     );  
 };  
 

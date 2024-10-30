@@ -4,6 +4,7 @@ import Logo from '../Assets/Logo.png';
 import axios from 'axios'; // For API requests
 import { ToastContainer, toast } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
+import Navbar from './Navbar'
 const SignUp = () => {
     const [formData, setFormData] = useState({
         fname: '',
@@ -41,7 +42,7 @@ const SignUp = () => {
             toast.error(error.response?.data?.message || "Sign up failed!");
         }
     };
-    return (
+    return (<><Navbar/>
         <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
             <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">
                 <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
@@ -114,7 +115,7 @@ const SignUp = () => {
                 <div className="hidden bg-cover lg:block lg:w-1/2" style={{ backgroundImage: `url(${signuppage})` }}></div>
             </div><ToastContainer/>
         </div>
-    );
+        </>  );
 };
 
 export default SignUp;

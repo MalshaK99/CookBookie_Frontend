@@ -1,13 +1,37 @@
-import React, { useState } from "react"
-import Logo from '../Assets/Logo.png'
+import Logo from '../Assets/Logo.png';
+import { AuthContext } from '../context/AuthContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
 
 export default function SideNavigationBasic() {
-  const [isSideNavOpen, setIsSideNavOpen] = useState(false)
+  const { logout } = useContext(AuthContext); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false); 
+  const navigate = useNavigate();
+  const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token); 
+  }, []);
+
+  const handleLogout = () => {
+    logout(); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("fname");
+    localStorage.removeItem("lname"); 
+    setIsAuthenticated(false); 
+    toast.success("Logout successful!");
+    navigate('/'); 
+    console.log("User logged out");
+  };
 
   return (
     <>
-      {/*  <!-- Component: Basic side navigation menu --> */}
-      {/*  <!-- Mobile trigger --> */}
+      {/* <!-- Component: Basic side navigation menu --> */}
+      {/* <!-- Mobile trigger --> */}
       <button
         title="Side navigation"
         type="button"
@@ -18,7 +42,7 @@ export default function SideNavigationBasic() {
         }`}
         aria-haspopup="menu"
         aria-label="Side navigation"
-        aria-expanded={isSideNavOpen ? " true" : "false"}
+        aria-expanded={isSideNavOpen ? "true" : "false"}
         aria-controls="nav-menu-1"
         onClick={() => setIsSideNavOpen(!isSideNavOpen)}
       >
@@ -38,7 +62,7 @@ export default function SideNavigationBasic() {
         </div>
       </button>
 
-      {/*  <!-- Side Navigation --> */}
+      {/* <!-- Side Navigation --> */}
       <aside
         id="nav-menu-1"
         aria-label="Side navigation"
@@ -47,27 +71,20 @@ export default function SideNavigationBasic() {
         }`}
       >
         <a
-      aria-label="CookBookie logo"
-      className="flex items-center gap-2 whitespace-nowrap p-6 text-xl font-medium focus:outline-none"
-      href="javascript:void(0)"
-    >
-      <img
-        src={Logo}
-        alt="CookBookie Logo"
-        className="h-8 w-8" 
-      />
-      CookBookie
-    </a>
-        <nav
-          aria-label="side navigation"
-          className="flex-1 divide-y divide-slate-100 overflow-auto"
+          aria-label="CookBookie logo"
+          className="flex items-center gap-2 whitespace-nowrap p-6 text-xl font-medium focus:outline-none"
+          href="/"
         >
+          <img src={Logo} alt="CookBookie Logo" className="h-8 w-8" />
+          CookBookie
+        </a>
+        <nav aria-label="side navigation" className="flex-1 divide-y divide-slate-100 overflow-auto">
           <div>
             <ul className="flex flex-1 flex-col gap-3 py-4">
               <li className="px-3">
                 <a
                   href="/"
-                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50 aria-[current=page]:bg-yellow-50 aria-[current=page]:text-yellow-500 "
+                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                 >
                   <div className="flex items-center self-center">
                     <svg
@@ -95,7 +112,7 @@ export default function SideNavigationBasic() {
               <li className="px-3">
                 <a
                   href="#"
-                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50 aria-[current=page]:bg-yellow-50 aria-[current=page]:text-yellow-500 "
+                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                   aria-current="page"
                 >
                   <div className="flex items-center self-center ">
@@ -122,7 +139,7 @@ export default function SideNavigationBasic() {
               <li className="px-3">
                 <a
                   href="/publish"
-                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50 aria-[current=page]:bg-yellow-50 aria-[current=page]:text-yellow-500 "
+                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                 >
                   <div className="flex items-center self-center ">
                     <svg
@@ -141,33 +158,37 @@ export default function SideNavigationBasic() {
                     </svg>
                   </div>
                   <div className="flex w-full flex-1 flex-col items-start justify-center gap-0 overflow-hidden truncate text-sm">
-                    Publish
+                    Publish Recipe
                   </div>
                 </a>
               </li>
-             
+              
               <li className="px-3">
                 <a
                   href="/history"
-                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50 aria-[current=page]:bg-yellow-50 aria-[current=page]:text-yellow-500"
+                  className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                 >
                   <div className="flex items-center self-center ">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="h-6 w-6"
-                      aria-label="Dashboard icon"
-                      role="graphics-symbol"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-                      />
-                    </svg>
+                  <svg
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  viewBox="0 0 24 24"
+  strokeWidth="1.5"
+  stroke="currentColor"
+  className="h-6 w-6"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M4.5 4.5C3.12 4.5 2 5.62 2 7v10c0 1.38 1.12 2.5 2.5 2.5h12c1.38 0 2.5-1.12 2.5-2.5V7c0-1.38-1.12-2.5-2.5-2.5H4.5zm0 1.5h12c.69 0 1.25.56 1.25 1.25v10c0 .69-.56 1.25-1.25 1.25H4.5c-.69 0-1.25-.56-1.25-1.25V7c0-.69.56-1.25 1.25-1.25z"
+  />
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M4.5 9h12M4.5 12h12M4.5 15h12"
+  />
+</svg>
+
                   </div>
                   <div className="flex w-full flex-1 flex-col items-start justify-center gap-0 overflow-hidden truncate text-sm">
                     History
@@ -177,28 +198,39 @@ export default function SideNavigationBasic() {
             </ul>
           </div>
         </nav>
-        <footer class="p-3 border-t border-slate-200">
-    <a href="#" class="flex items-center gap-3 p-3 transition-colors rounded text-slate-900 hover:text-yellow-500 ">
-      <div class="flex items-center self-center ">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" aria-label="Dashboard icon" role="graphics-symbol">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <div class="flex flex-col items-start justify-center flex-1 w-full gap-0 overflow-hidden text-sm font-medium truncate">
-        Logout
-      </div>
-    </a>
-  </footer>
+        <footer className="p-3 border-t border-slate-200">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 p-3 transition-colors rounded text-slate-900 hover:text-yellow-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+              aria-label="Logout icon"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.25 9l-3 3m0 0l3 3m-3-3h7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="flex flex-col items-start justify-center flex-1 w-full gap-0 overflow-hidden text-sm font-medium truncate">
+              Logout
+            </span>
+          </button>
+        </footer>
       </aside>
 
-      {/*  <!-- Backdrop --> */}
       <div
         className={`fixed top-0 bottom-0 left-0 right-0 z-30 bg-slate-900/20 transition-colors sm:hidden ${
           isSideNavOpen ? "block" : "hidden"
         }`}
         onClick={() => setIsSideNavOpen(false)}
       ></div>
-      {/*  <!-- End Basic side navigation menu --> */}
     </>
-  )
+  );
 }

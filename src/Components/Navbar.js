@@ -1,6 +1,5 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Link, useNavigate } from "react-router-dom";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Logo from "../Assets/Logo.png";
 import { BsCart2 } from "react-icons/bs";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -17,39 +16,38 @@ import InfoIcon from "@mui/icons-material/Info";
 import CommentRoundedIcon from "@mui/icons-material/CommentRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 
-// Import AuthContext and toast
 import { AuthContext } from '../context/AuthContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useContext(AuthContext); // Get auth state and logout function
+  const { logout } = useContext(AuthContext); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false); 
   const [openMenu, setOpenMenu] = useState(false);
-  const navigate = useNavigate(); // Used to redirect after logout
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token); 
+  }, []);
 
   const handleLogout = () => {
-    logout(); // Call logout from AuthContext
-    toast.success("Logout successful!"); // Display toast message
-    navigate('/'); // Redirect to home page after logout
+    logout(); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("email");
+    localStorage.removeItem("fname");
+    localStorage.removeItem("lname"); 
+    setIsAuthenticated(false); 
+    toast.success("Logout successful!");
+    navigate('/'); 
   };
 
   const menuOptions = [
-    {
-      text: "Home",
-      icon: <HomeIcon />,
-    },
-    {
-      text: "About",
-      icon: <InfoIcon />,
-    },
-    {
-      text: "Testimonials",
-      icon: <CommentRoundedIcon />,
-    },
-    {
-      text: "Contact",
-      icon: <PhoneRoundedIcon />,
-    },
+    { text: "Home", icon: <HomeIcon /> },
+    { text: "About", icon: <InfoIcon /> },
+    { text: "Testimonials", icon: <CommentRoundedIcon /> },
+    { text: "Contact", icon: <PhoneRoundedIcon /> },
   ];
 
   return (
@@ -63,9 +61,6 @@ const Navbar = () => {
         <a href="/profile">Profile</a>
         <a href="/about">About</a>
         <a href="/contact">Contact</a>
-        {/* <a href="">
-          <BsCart2 className="navbar-cart-icon" />
-        </a> */}
         {isAuthenticated ? (
           <button className="primary-button" onClick={handleLogout}>Logout</button>
         ) : (
@@ -97,7 +92,6 @@ const Navbar = () => {
           <Divider />
         </Box>
       </Drawer>
-      {/* Add ToastContainer to display toast messages */}
       <ToastContainer />
     </nav>
   );

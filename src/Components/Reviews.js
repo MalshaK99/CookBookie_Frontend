@@ -23,7 +23,7 @@ const Testimonial = () => {
         This is definitely going to be a regular meal in our house!
         Highly recommend it to anyone looking for a quick and delicious dinner idea.
         </p>
-        <div className="testimonials-stars-container">
+        <div className="testimonials-stars-container flex">
           <AiFillStar />
           <AiFillStar />
           <AiFillStar />
