@@ -25,26 +25,19 @@ const LoginP = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Make login request to the backend
             const response = await axios.post('http://localhost:5000/api/users/login', formData);
 
-            console.log(response); // Check the response in the console
-
-            // Check if login was successful (HTTP status 200)
+            console.log(response); 
             if (response.status === 200) {
-                // Extract token and user details
                 const { token, user } = response.data;
 
-                // Save token and user details to localStorage
                 localStorage.setItem('token', token);
                 localStorage.setItem('fname', user.fname);
                 localStorage.setItem('lname', user.lname);
                 localStorage.setItem('email', user.email);
 
-                // Call the login function from AuthContext
                 login();
 
-                // Show success message
                 toast.success('Login Successful!');
 
                 navigate('/');
@@ -54,14 +47,17 @@ const LoginP = () => {
         } catch (error) {
             console.error(error);
 
-            // Show error message from server if available, else show default error
             toast.error(error.response?.data?.message || "Login failed!");
         }
     };
        
 
     return (  <>
-        <Navbar/>
+            <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-lg p-1">
+        <div className="bg-white rounded-lg p-5 shadow-md">
+            <Navbar />
+        </div>
+    </div>
         <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900"> 
             <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">  
                 <div className="hidden bg-cover lg:block lg:w-1/2" style={{ backgroundImage: `url(${loginpage})` }}></div>  
