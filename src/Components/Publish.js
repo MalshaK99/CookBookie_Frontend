@@ -35,13 +35,21 @@ const Publish = () => {
         
         // Append the image file
         if (file) {
-            data.append('image', file);  // Use 'image' as specified in the backend
+            data.append('image', file);  // Ensure 'image' matches your backend field name
         }
 
         try {
+            // Get token from local storage
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('No authentication token found');
+                return;
+            }
+
             await axios.post('http://localhost:5000/api/recipes/recipe', data, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
                 }
             });
             toast.success('Recipe successfully uploaded!');
@@ -53,9 +61,14 @@ const Publish = () => {
                 phone: '',
                 description: ''
             });
-            setFile(null);
+            setFile(null); // Reset file input
+            document.getElementById("image").value = ""; // Clear file input in DOM
         } catch (error) {
-            toast.error('Error uploading recipe');
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Error uploading recipe');
+            }
             console.error('There was an error uploading the recipe!', error);
         }
     };
@@ -126,7 +139,7 @@ const Publish = () => {
 
                         <div className="sm:col-span-3">
                             <label htmlFor="image" className="inline-block text-sm font-medium text-gray-500 mt-2.5 dark:text-neutral-500">
-                                Attach your advertisement
+                                Attach your recipe
                             </label>
                         </div>
                         <div className="sm:col-span-9">

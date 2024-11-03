@@ -1,81 +1,203 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 const History = () => {
+    const [recipes, setRecipes] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
+    const [currentRecipe, setCurrentRecipe] = useState(null); // To store the recipe being updated
+
+    useEffect(() => {
+        const fetchUserRecipes = async () => {
+            try {
+                const token = localStorage.getItem('token'); 
+                const response = await axios.get('http://localhost:5000/api/recipes/my-recipes', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setRecipes(response.data); 
+            } catch (error) {
+                console.error('Error fetching user recipes:', error);
+            }
+        };
+        fetchUserRecipes();
+    }, []);
+
+    const openUpdateModal = (recipe) => {
+        setCurrentRecipe(recipe);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setCurrentRecipe(null);
+    };
+    useEffect(() => {
+        const fetchUserRecipes = async () => {
+            try {
+                const token = localStorage.getItem('token'); 
+                const response = await axios.get('http://localhost:5000/api/recipes/my-recipes', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setRecipes(response.data); 
+            } catch (error) {
+                console.error('Error fetching user recipes:', error);
+            }
+        };
+        fetchUserRecipes();
+    }, []);
+
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:5000/api/recipes/recipe/${id}`);
+            setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe._id !== id));
+            toast.success('Successfully deleted the recipe');
+        } catch (error) {
+            console.error('Error deleting recipe:', error);
+            toast.error('Error deleting recipe');
+        }
+    };
+
+    const showDeleteConfirmation = (id) => {
+        confirmAlert({
+            title: 'Confirm to Delete',
+            message: 'Are you sure you want to delete this recipe?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => handleDelete(id)
+                },
+                {
+                    label: 'No',
+                    onClick: () => { }
+                }
+            ]
+        });
+    };
+
     return (
-        <section class="dark:bg-gray-900">
-            <div class="container px-6 py-10 mx-auto">
-                <div class="text-center">
-                    <h1 class="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">Your Recipes</h1>
+        <section className="dark:bg-gray-900">
+            <ToastContainer />
+            <div className="container px-6 py-10 mx-auto">
+                <div className="text-center">
+                    <h1 className="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
+                    <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-lg p-1">
+        <div className="bg-white rounded-lg p-5 shadow-md">
+                Your Recipes        </div>
+    </div>                    </h1>
                 </div>
 
-                <div class="grid grid-cols-1 gap-8 mt-8 md:mt-16 md:grid-cols-2 xl:grid-cols-3">
-                    <div>
-                        <div class="relative">
-                            <img class="object-cover object-center w-full h-64 rounded-lg lg:h-80" src="https://images.unsplash.com/photo-1624996379697-f01d168b1a52?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="" />
-
-                            <div class="absolute bottom-0 flex p-3 bg-white dark:bg-gray-900 ">
-                                <img class="object-cover object-center w-10 h-10 rounded-full" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="" />
-
-                                <div class="mx-4">
-                                    <h1 class="text-sm text-gray-700 dark:text-gray-200">Tom Hank</h1>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Creative Director</p>
+                <div className="grid grid-cols-1 gap-8 mt-8 md:mt-16 md:grid-cols-2 xl:grid-cols-3">
+                    {recipes.map((recipe) => (
+                        <div key={recipe._id}>
+                            <div className="relative">
+                                <img
+                                    className="object-cover object-center w-full h-64 rounded-lg lg:h-80"
+                                    src={`http://localhost:5000/${recipe.imagePath}`}
+                                    alt={recipe.name}
+                                />
+                                <div className="absolute bottom-0 flex p-3 bg-white dark:bg-gray-900">
+                                    <div className="mx-4">
+                                        <h1 className="text-sm text-gray-700 dark:text-gray-200">{recipe.name}</h1>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{recipe.email}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <h1 class="mt-6 text-xl font-semibold text-gray-800 dark:text-white">
-                            What do you want to know about UI
-                        </h1>
+                            <h1 className="mt-6 text-xl font-semibold text-gray-800 dark:text-white">
+                                {recipe.name}
+                            </h1>
 
-                        <hr class="w-32 my-6 text-blue-500" />
+                            <hr className="w-32 my-6 text-blue-500" />
 
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis fugit dolorum amet dolores
-                            praesentium, alias nam? Tempore
-                        </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                {recipe.description}
+                            </p>
 
-
-                        {/* Update and Delete Buttons */}
-                        <div class="mt-4 flex space-x-4">
-                            <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Update</button>
-                            <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
-                        </div>
-                    </div>
-
-                    {/* Repeat for other blog posts */}
-                    <div>
-                        <div class="relative">
-                            <img class="object-cover object-center w-full h-64 rounded-lg lg:h-80" src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="" />
-
-                            <div class="absolute bottom-0 flex p-3 bg-white dark:bg-gray-900 ">
-                                <img class="object-cover object-center w-10 h-10 rounded-full" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80" alt="" />
-
-                                <div class="mx-4">
-                                    <h1 class="text-sm text-gray-700 dark:text-gray-200">arthur melo</h1>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Creative Director</p>
-                                </div>
+                            <div className="mt-4 flex space-x-4">
+                                <button 
+                                onClick={()=>openUpdateModal(recipe)}
+                                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Update</button>
+                                <button
+                                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                    onClick={() => showDeleteConfirmation(recipe._id)}
+                                >
+                                    Delete
+                                </button>
                             </div>
                         </div>
-
-                        <h1 class="mt-6 text-xl font-semibold text-gray-800 dark:text-white">
-                            All the features you want to know
-                        </h1>
-
-                        <hr class="w-32 my-6 text-blue-500" />
-
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis fugit dolorum amet dolores
-                            praesentium, alias nam? Tempore
-                        </p>
-
-
-                        {/* Update and Delete Buttons */}
-                        <div class="mt-4 flex space-x-4">
-                            <button class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Update</button>
-                            <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
-                        </div>
-                    </div>
-
-                    {/* Add more blog posts similarly */}
+                    ))}
                 </div>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-10 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
+                        <div className="relative px-4 pt-5 pb-4 bg-white rounded-lg shadow-xl dark:bg-gray-900 sm:w-full sm:max-w-md sm:p-6">
+                            <h3 className="text-lg font-medium leading-6 text-gray-800 capitalize dark:text-white">
+                                Update Recipe
+                            </h3>
+                                <form className="mt-4">
+                                <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-name">
+                                     Name
+                                </label>
+                                <input
+                                    type="text"
+                                    id="recipe-name"
+                                    defaultValue={currentRecipe?.name}
+                                    className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
+                                />
+                                 <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-name">
+                                     Email
+                                </label>
+                                <input
+                                    type="text"
+                                    id="recipe-email"
+                                    defaultValue={currentRecipe?.email}
+                                    className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
+                                />
+                                 <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-name">
+                                     Image
+                                </label>
+                                <input
+                                    type="file"
+                                    id="recipe-image"
+                                    defaultValue={currentRecipe?.imagepath}
+                                    className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
+                                />
+                                 <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-name">
+                                     Description
+                                </label>
+                                <input
+                                    type="text"
+                                    id="recipe-description"
+                                    defaultValue={currentRecipe?.description}
+                                    className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
+                                />
+                                {/* Additional fields can go here */}
+                                
+                                <div className="mt-4 flex space-x-4">
+                                    <button
+                                        type="button"
+                                        onClick={closeModal}
+                                        className="w-full px-4 py-2 text-sm font-medium text-gray-700 capitalize transition-colors duration-300 transform border rounded-md dark:text-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="w-full px-4 py-2  text-sm font-medium text-white capitalize bg-yellow-600 rounded-md hover:bg-yellow-500 focus:outline-none"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
     );

@@ -51,6 +51,7 @@ export default function ProfilePage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
+        console.log(token)
 
         if (!token) {
             toast.error("No authorization token found. Please log in.");
