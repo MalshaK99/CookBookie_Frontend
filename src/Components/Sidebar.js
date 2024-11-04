@@ -1,30 +1,30 @@
-import Logo from '../Assets/Logo.png';
-import { AuthContext } from '../context/AuthContext';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Logo from "../Assets/Logo.png";
+import { AuthContext } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useContext, useEffect } from "react";
 
 export default function SideNavigationBasic() {
-  const { logout } = useContext(AuthContext); 
-  const [isAuthenticated, setIsAuthenticated] = useState(false); 
+  const { logout } = useContext(AuthContext);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token); 
+    setIsAuthenticated(!!token);
   }, []);
 
   const handleLogout = () => {
-    logout(); 
+    logout();
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("fname");
-    localStorage.removeItem("lname"); 
-    setIsAuthenticated(false); 
+    localStorage.removeItem("lname");
+    setIsAuthenticated(false);
     toast.success("Logout successful!");
-    navigate('/'); 
+    navigate("/");
     console.log("User logged out");
   };
 
@@ -78,7 +78,10 @@ export default function SideNavigationBasic() {
           <img src={Logo} alt="CookBookie Logo" className="h-8 w-8" />
           CookBookie
         </a>
-        <nav aria-label="side navigation" className="flex-1 divide-y divide-slate-100 overflow-auto">
+        <nav
+          aria-label="side navigation"
+          className="flex-1 divide-y divide-slate-100 overflow-auto"
+        >
           <div>
             <ul className="flex flex-1 flex-col gap-3 py-4">
               <li className="px-3">
@@ -111,7 +114,7 @@ export default function SideNavigationBasic() {
               </li>
               <li className="px-3">
                 <a
-                  href="#"
+                  href="/profile"
                   className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                   aria-current="page"
                 >
@@ -162,33 +165,32 @@ export default function SideNavigationBasic() {
                   </div>
                 </a>
               </li>
-              
+
               <li className="px-3">
                 <a
                   href="/history"
                   className="flex items-center gap-8 rounded p-3 text-slate-700 transition-colors hover:bg-yellow-50 hover:text-yellow-500 focus:bg-yellow-50"
                 >
                   <div className="flex items-center self-center ">
-                  <svg
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  viewBox="0 0 24 24"
-  strokeWidth="1.5"
-  stroke="currentColor"
-  className="h-6 w-6"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M4.5 4.5C3.12 4.5 2 5.62 2 7v10c0 1.38 1.12 2.5 2.5 2.5h12c1.38 0 2.5-1.12 2.5-2.5V7c0-1.38-1.12-2.5-2.5-2.5H4.5zm0 1.5h12c.69 0 1.25.56 1.25 1.25v10c0 .69-.56 1.25-1.25 1.25H4.5c-.69 0-1.25-.56-1.25-1.25V7c0-.69.56-1.25 1.25-1.25z"
-  />
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M4.5 9h12M4.5 12h12M4.5 15h12"
-  />
-</svg>
-
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="h-6 w-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 4.5C3.12 4.5 2 5.62 2 7v10c0 1.38 1.12 2.5 2.5 2.5h12c1.38 0 2.5-1.12 2.5-2.5V7c0-1.38-1.12-2.5-2.5-2.5H4.5zm0 1.5h12c.69 0 1.25.56 1.25 1.25v10c0 .69-.56 1.25-1.25 1.25H4.5c-.69 0-1.25-.56-1.25-1.25V7c0-.69.56-1.25 1.25-1.25z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 9h12M4.5 12h12M4.5 15h12"
+                      />
+                    </svg>
                   </div>
                   <div className="flex w-full flex-1 flex-col items-start justify-center gap-0 overflow-hidden truncate text-sm">
                     History

@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './Navbar' 
 
 const LoginP = () => {
-    const { login } = useContext(AuthContext); // Assuming you have an AuthContext
+    const { login } = useContext(AuthContext); 
     const [formData, setFormData] = useState({ email: '', password: '' });
     const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const LoginP = () => {
 
                 localStorage.setItem('token', token);
                 localStorage.setItem('fname', user.fname);
-                localStorage.setItem('lname', user.lname);
+                localStorage.setItem('phone', user.lname);
                 localStorage.setItem('email', user.email);
 
                 login();
@@ -53,11 +53,7 @@ const LoginP = () => {
        
 
     return (  <>
-            <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-lg p-1">
-        <div className="bg-white rounded-lg p-5 shadow-md">
-            <Navbar />
-        </div>
-    </div>
+            <Navbar/>
         <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900"> 
             <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 lg:max-w-4xl">  
                 <div className="hidden bg-cover lg:block lg:w-1/2" style={{ backgroundImage: `url(${loginpage})` }}></div>  
