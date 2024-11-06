@@ -10,61 +10,51 @@ const History = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRecipe, setCurrentRecipe] = useState(null);
 
+  // Fetch the recipes on mount
   useEffect(() => {
     const fetchUserRecipes = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("No token found. Please log in.");
+        return;
+      }
+
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:5000/api/recipes/my-recipes",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setRecipes(response.data);
+        const response = await axios.get("http://localhost:5000/api/recipes/my-recipes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data) {
+          setRecipes(response.data);
+        }
       } catch (error) {
         console.error("Error fetching user recipes:", error);
+        toast.error("Error fetching recipes. Please try again.");
       }
     };
-    fetchUserRecipes();
-  }, []);
 
+    fetchUserRecipes();
+  }, []); // Empty dependency array to run only once
+
+  // Open modal for updating a recipe
   const openUpdateModal = (recipe) => {
     setCurrentRecipe(recipe);
     setIsModalOpen(true);
   };
 
+  // Close the modal
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentRecipe(null);
   };
-  useEffect(() => {
-    const fetchUserRecipes = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:5000/api/recipes/my-recipes",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setRecipes(response.data);
-      } catch (error) {
-        console.error("Error fetching user recipes:", error);
-      }
-    };
-    fetchUserRecipes();
-  }, []);
 
+  // Handle recipe deletion
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/recipes/recipe/${id}`);
-      setRecipes((prevRecipes) =>
-        prevRecipes.filter((recipe) => recipe._id !== id)
-      );
+      setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe._id !== id));
       toast.success("Successfully deleted the recipe");
     } catch (error) {
       console.error("Error deleting recipe:", error);
@@ -72,6 +62,7 @@ const History = () => {
     }
   };
 
+  // Show a confirmation before deleting
   const showDeleteConfirmation = (id) => {
     confirmAlert({
       title: "Confirm to Delete",
@@ -83,7 +74,6 @@ const History = () => {
         },
         {
           label: "No",
-          onClick: () => {},
         },
       ],
     });
@@ -110,18 +100,9 @@ const History = () => {
                 <img
                   className="object-cover object-center w-full h-64 rounded-lg lg:h-80"
                   src={`http://localhost:5000/${recipe.imagePath}`}
-                  alt={recipe.name}
+                  alt={recipe.recipeName}
                 />
-                <div className="absolute bottom-0 flex p-3 bg-white dark:bg-gray-900">
-                  <div className="mx-4">
-                    <h1 className="text-sm text-gray-700 dark:text-gray-200">
-                      {recipe.name}
-                    </h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {recipe.email}
-                    </p>
-                  </div>
-                </div>
+               
               </div>
               <hr className="w-32 my-6 text-blue-500" />
 
@@ -157,26 +138,15 @@ const History = () => {
                   className="text-sm text-yellow-700 dark:text-gray-200"
                   htmlFor="recipe-name"
                 >
-                  Name
+                  Recipe Name
                 </label>
                 <input
                   type="text"
                   id="recipe-name"
-                  defaultValue={currentRecipe?.name}
+                  defaultValue={currentRecipe?.recipeName}
                   className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
                 />
-                <label
-                  className="text-sm text-yellow-700 dark:text-gray-200"
-                  htmlFor="recipe-name"
-                >
-                  Email
-                </label>
-                <input
-                  type="text"
-                  id="recipe-email"
-                  defaultValue={currentRecipe?.email}
-                  className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
-                />
+               
                 <label
                   className="text-sm text-yellow-700 dark:text-gray-200"
                   htmlFor="recipe-name"

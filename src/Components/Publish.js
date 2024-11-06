@@ -5,9 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Publish = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    recipeName: "",
     description: "",
   });
   const [file, setFile] = useState(null);
@@ -28,9 +26,7 @@ const Publish = () => {
     const data = new FormData();
 
     // Append form fields to FormData
-    data.append("name", formData.name);
-    data.append("email", formData.email);
-    data.append("phone", formData.phone);
+    data.append("recipeName", formData.recipeName);
     data.append("description", formData.description);
 
     // Append the image file
@@ -56,9 +52,7 @@ const Publish = () => {
 
       // Reset form after successful submission
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
+        recipeName: "",
         description: "",
       });
       setFile(null); // Reset file input
@@ -98,55 +92,15 @@ const Publish = () => {
                 htmlFor="name"
                 className="inline-block text-sm font-medium text-gray-500 mt-2.5 dark:text-neutral-500"
               >
-                Full name
+                Recipe name
               </label>
             </div>
             <div className="sm:col-span-9">
               <input
-                id="name"
-                name="name"
+                id="recipeName"
+                name="recipeName"
                 type="text"
-                value={formData.name}
-                onChange={handleChange}
-                className="py-2 px-3 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-                required
-              />
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="email"
-                className="inline-block text-sm font-medium text-gray-500 mt-2.5 dark:text-neutral-500"
-              >
-                Email
-              </label>
-            </div>
-            <div className="sm:col-span-9">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="py-2 px-3 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-                required
-              />
-            </div>
-
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="phone"
-                className="inline-block text-sm font-medium text-gray-500 mt-2.5 dark:text-neutral-500"
-              >
-                Phone
-              </label>
-            </div>
-            <div className="sm:col-span-9">
-              <input
-                id="phone"
-                name="phone"
-                type="text"
-                value={formData.phone}
+                value={formData.recipeName}
                 onChange={handleChange}
                 className="py-2 px-3 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                 required
