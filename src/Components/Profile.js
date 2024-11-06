@@ -13,23 +13,16 @@ export default function ProfilePage() {
   });
 
   const [profileImage, setProfileImage] = useState(chef);
-
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("tokenn", token);
         if (token) {
-          const response = await axios.get(
-            "http://localhost:5000/api/users/me",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          const response = await axios.get("http://localhost:5000/api/users/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           setUserData({
             fname: response.data.fname,
             phone: response.data.phone,
@@ -59,9 +52,7 @@ export default function ProfilePage() {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
-
-      // You can also upload the file to the server here if needed
-      // (e.g., send it to an API endpoint)
+      // Optionally upload the file here
     }
   };
 
@@ -72,7 +63,8 @@ export default function ProfilePage() {
       [name]: value,
     });
   };
-  const handleSubmit = async (e) => {
+
+  const handleDetailsSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
@@ -85,25 +77,12 @@ export default function ProfilePage() {
       fname: userData.fname,
       phone: userData.phone,
       email: userData.email,
-      ...(userData.currentPassword && {
-        currentPassword: userData.currentPassword,
-      }),
-      ...(userData.newPassword && { newPassword: userData.newPassword }),
     };
 
-    // Log the payload to check its contents
-    console.log("Payload being sent:", payload);
-
     try {
-      const response = await axios.put(
-        "http://localhost:5000/api/users/update",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.put("http://localhost:5000/api/users/update", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("User details updated successfully!");
     } catch (error) {
       toast.error(
@@ -112,28 +91,53 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("No authorization token found. Please log in.");
+      return;
+    }
+
+    const payload = {
+      currentPassword: userData.currentPassword,
+      newPassword: userData.newPassword,
+    };
+
+    try {
+      await axios.put("http://localhost:5000/api/users/update-password", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Password updated successfully!");
+      setUserData((prevData) => ({ ...prevData, currentPassword: "", newPassword: "" }));
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update password."
+      );
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-6 space-y-8">
-      <div className="border-b border-gray-300 pb-8">
+    <div className="max-w-3xl mx-auto p-6 space-y-8">
+      {/* Personal Details Form */}
+      <form onSubmit={handleDetailsSubmit} className="border-b border-gray-300 pb-8">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl">
             <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-lg p-1">
-              <div className="bg-white rounded-lg p-5 shadow-md">
-                Personal Information
-              </div>
+              <div className="bg-white rounded-lg p-5 shadow-md">Personal Information</div>
             </div>
           </h1>
         </div>
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div className="flex items-center gap-x-6">
             <img
-              className="object-cover w-16 h-16 rounded-full ring ring-yellow-600 dark:ring-yellow-900 cursor-pointer"
+              className="object-cover w-16 h-16 rounded-full ring ring-yellow-600 cursor-pointer"
               src={profileImage}
               alt="Profile Avatar"
               onClick={handleImageClick}
             />
             <div>Change Profile Picture</div>
-
             <input
               type="file"
               ref={fileInputRef}
@@ -142,14 +146,8 @@ export default function ProfilePage() {
               onChange={handleImageChange}
             />
           </div>
-
           <div className="sm:col-span-2">
-            <label
-              htmlFor="fname"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Full Name
-            </label>
+            <label htmlFor="fname" className="block text-sm font-medium text-gray-900">Full Name</label>
             <input
               id="fname"
               name="fname"
@@ -160,12 +158,7 @@ export default function ProfilePage() {
             />
           </div>
           <div className="sm:col-span-2">
-            <label
-              htmlFor="phone"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Phone Number
-            </label>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-900">Phone Number</label>
             <input
               id="phone"
               name="phone"
@@ -175,14 +168,8 @@ export default function ProfilePage() {
               className="mt-2 block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-yellow-600 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500"
             />
           </div>
-
           <div className="sm:col-span-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Email Address
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900">Email Address</label>
             <input
               id="email"
               name="email"
@@ -193,20 +180,19 @@ export default function ProfilePage() {
             />
           </div>
         </div>
-      </div>
+        <div className="mt-6 flex justify-end">
+          <button type="submit" className="rounded-md bg-yellow-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500">
+            Update Details
+          </button>
+        </div>
+      </form>
 
-      <div className="border-b border-gray-300 pb-8">
-        <h2 className="text-lg font-semibold leading-7 text-gray-900">
-          Password Change
-        </h2>
+      {/* Password Change Form */}
+      <form onSubmit={handlePasswordSubmit} className="border-b border-gray-300 pb-8">
+        <h2 className="text-lg font-semibold leading-7 text-gray-900">Password Change</h2>
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
-            <label
-              htmlFor="currentPassword"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Current Password
-            </label>
+            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-900">Current Password</label>
             <input
               id="currentPassword"
               name="currentPassword"
@@ -216,14 +202,8 @@ export default function ProfilePage() {
               className="mt-2 block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-yellow-600 placeholder:text-gray-400 focus:ring-2 focus:ring-yellow-500"
             />
           </div>
-
           <div>
-            <label
-              htmlFor="newPassword"
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              New Password
-            </label>
+            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-900">New Password</label>
             <input
               id="newPassword"
               name="newPassword"
@@ -235,14 +215,11 @@ export default function ProfilePage() {
           </div>
         </div>
         <div className="mt-6 flex justify-end">
-          <button
-            type="submit"
-            className="rounded-md bg-yellow-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500"
-          >
-            Update
+          <button type="submit" className="rounded-md bg-yellow-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500">
+            Update Password
           </button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
