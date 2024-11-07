@@ -9,6 +9,11 @@ const History = () => {
   const [recipes, setRecipes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRecipe, setCurrentRecipe] = useState(null);
+  const [formData, setFormData] = useState({
+    recipeName: "",
+    description: "",
+    image: null,
+  });
 
   // Fetch the recipes on mount
   useEffect(() => {
@@ -41,6 +46,11 @@ const History = () => {
   // Open modal for updating a recipe
   const openUpdateModal = (recipe) => {
     setCurrentRecipe(recipe);
+    setFormData({
+      recipeName: recipe.recipeName,
+      description: recipe.description,
+      image: null, // Reset the image when opening the modal
+    });
     setIsModalOpen(true);
   };
 
@@ -48,6 +58,67 @@ const History = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentRecipe(null);
+  };
+
+  // Handle form input change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle file input change
+  const handleFileChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      image: e.target.files[0],
+    }));
+  };
+
+  // Handle recipe update
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const form = new FormData();
+      form.append("recipeName", formData.recipeName);
+      form.append("description", formData.description);
+      if (formData.image) {
+        form.append("image", formData.image); // Append the image file if it's selected
+      }
+
+      const response = await axios.put(
+        `http://localhost:5000/api/recipes/update/${currentRecipe._id}`,
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      
+
+      if (response.data) {
+        toast.success("Recipe updated successfully");
+        setRecipes((prevRecipes) =>
+          prevRecipes.map((recipe) =>
+            recipe._id === currentRecipe._id ? response.data.recipe : recipe
+          )
+        );
+        closeModal();
+      }
+    } catch (error) {
+      console.error("Error updating recipe:", error);
+      toast.error("Error updating recipe");
+    }
   };
 
   // Handle recipe deletion
@@ -86,10 +157,8 @@ const History = () => {
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-800 capitalize lg:text-3xl dark:text-white">
             <div className="bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-lg p-1">
-              <div className="bg-white rounded-lg p-5 shadow-md">
-                Your Recipes
-              </div>{" "}
-            </div>{" "}
+              <div className="bg-white rounded-lg p-5 shadow-md">Your Recipes</div>
+            </div>
           </h1>
         </div>
 
@@ -102,13 +171,10 @@ const History = () => {
                   src={`http://localhost:5000/${recipe.imagePath}`}
                   alt={recipe.recipeName}
                 />
-               
               </div>
+              <p className="text-sm text-gray-800 dark:text-gray-600">{recipe.recipeName}</p>
               <hr className="w-32 my-6 text-blue-500" />
-
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {recipe.description}
-              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{recipe.description}</p>
 
               <div className="mt-4 flex space-x-4">
                 <button
@@ -127,51 +193,48 @@ const History = () => {
             </div>
           ))}
         </div>
+
         {isModalOpen && (
           <div className="fixed inset-0 z-10 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
             <div className="relative px-4 pt-5 pb-4 bg-white rounded-lg shadow-xl dark:bg-gray-900 sm:w-full sm:max-w-md sm:p-6">
               <h3 className="text-lg font-medium leading-6 text-gray-800 capitalize dark:text-white">
                 Update Recipe
               </h3>
-              <form className="mt-4">
-                <label
-                  className="text-sm text-yellow-700 dark:text-gray-200"
-                  htmlFor="recipe-name"
-                >
+              <form className="mt-4" onSubmit={handleUpdate}>
+                <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-name">
                   Recipe Name
                 </label>
                 <input
                   type="text"
                   id="recipe-name"
-                  defaultValue={currentRecipe?.recipeName}
+                  name="recipeName"
+                  value={formData.recipeName}
+                  onChange={handleInputChange}
                   className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
                 />
-               
-                <label
-                  className="text-sm text-yellow-700 dark:text-gray-200"
-                  htmlFor="recipe-name"
-                >
+
+                <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-image">
                   Image
                 </label>
                 <input
                   type="file"
                   id="recipe-image"
-                  defaultValue={currentRecipe?.imagepath}
+                  name="image"
+                  onChange={handleFileChange}
                   className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
                 />
-                <label
-                  className="text-sm text-yellow-700 dark:text-gray-200"
-                  htmlFor="recipe-name"
-                >
+
+                <label className="text-sm text-yellow-700 dark:text-gray-200" htmlFor="recipe-description">
                   Description
                 </label>
                 <input
                   type="text"
                   id="recipe-description"
-                  defaultValue={currentRecipe?.description}
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                   className="block w-full px-4 py-3 mt-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300"
                 />
-                {/* Additional fields can go here */}
 
                 <div className="mt-4 flex space-x-4">
                   <button
@@ -183,7 +246,7 @@ const History = () => {
                   </button>
                   <button
                     type="submit"
-                    className="w-full px-4 py-2  text-sm font-medium text-white capitalize bg-yellow-600 rounded-md hover:bg-yellow-500 focus:outline-none"
+                    className="w-full px-4 py-2 text-sm font-medium text-white capitalize bg-yellow-600 rounded-md hover:bg-yellow-500 focus:outline-none"
                   >
                     Save
                   </button>
