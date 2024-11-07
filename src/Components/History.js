@@ -123,8 +123,18 @@ const History = () => {
 
   // Handle recipe deletion
   const handleDelete = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("No token found. Please log in.");
+      return;
+    }
+  
     try {
-      await axios.delete(`http://localhost:5000/api/recipes/recipe/${id}`);
+      await axios.delete(`http://localhost:5000/api/recipes/recipe/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRecipes((prevRecipes) => prevRecipes.filter((recipe) => recipe._id !== id));
       toast.success("Successfully deleted the recipe");
     } catch (error) {
@@ -132,6 +142,7 @@ const History = () => {
       toast.error("Error deleting recipe");
     }
   };
+  
 
   // Show a confirmation before deleting
   const showDeleteConfirmation = (id) => {
