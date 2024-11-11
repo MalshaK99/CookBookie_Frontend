@@ -1,76 +1,72 @@
-import React from "react";  
-import Navbar from "./Navbar";  // Assuming you still want to keep the Navbar  
-import RecipeBg2 from "../Assets/loginpage.jpg"; // You can choose to keep this or remove it based on your needs  
-import FormElementsSearchRoundedBaseBasic from "./SearchBar"; // Importing the search bar component  
+import React, { useState, useEffect } from "react";  
+import Navbar from "./Navbar";  
+import RecipeBg2 from "../Assets/loginpage.jpg"; // Assuming you might use this somewhere  
+import FormElementsSearchRoundedBaseBasic from "./SearchBar";  
+
 const About = () => {  
+  const [recipes, setRecipes] = useState([]);  
+  const [loading, setLoading] = useState(true);  
+  const [error, setError] = useState(null);  
+
+  useEffect(() => {  
+    const fetchRecipes = async () => {  
+      try {  
+        const response = await fetch("http://localhost:5000/api/recipes/all-recipes");  
+        if (!response.ok) {  
+          throw new Error("Failed to fetch recipes");  
+        }  
+        const data = await response.json();  
+        setRecipes(data);  
+      } catch (error) {  
+        console.error("Error fetching recipes:", error);  
+        setError("Failed to load recipes. Please try again later.");  
+      } finally {  
+        setLoading(false);  
+      }  
+    };  
+
+    fetchRecipes();  
+  }, []);  
+
   return (  
     <div>  
       <Navbar />  
-      
-      {/* Search Bar Section */}  
-      <div className="search-bar-container flex justify-end">  
-  <FormElementsSearchRoundedBaseBasic className="search-input" />  
-</div>  
+      <div className="search-bar-container flex justify-end mt-6 mb-4"> {/* Reduced margin-bottom */}  
+        <FormElementsSearchRoundedBaseBasic className="search-input" />  
+      </div>  
 
-      {/* New Section After Search Bar */}  
-      <section className="bg-white dark:bg-gray-900">  
-        <div className="container px-6 py-10 mx-auto">  
-          <div className="lg:-mx-6 lg:flex lg:items-center">  
-            <img  
-              className="object-cover object-center lg:w-1/2 lg:mx-6 w-full h-96 rounded-lg lg:h-[36rem]"  
-              src={RecipeBg2}
-              alt=""  
-            />  
-            <div className="mt-8 lg:w-1/2 lg:px-6 lg:mt-0">  
+      <section className="recipes-section py-12 bg-gray-100 dark:bg-gray-800">  
+        <div className="px-4 mx-auto">  
+          <h2 className="text-3xl font-semibold text-center text-yellow-800 dark:text-white mb-8">  
+            All Recipes  
+          </h2>  
 
-              <h1 className="text-2xl font-semibold text-gray-800 dark:text-white lg:text-3xl lg:w-96">  
-                Help us improve our productivity  
-              </h1>  
-
-              <p className="max-w-lg mt-6 text-gray-500 dark:text-gray-400 ">  
-                “ Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore quibusdam ducimus libero ad  
-                tempora doloribus expedita laborum saepe voluptas perferendis delectus assumenda rerum, culpa  
-                aperiam dolorum, obcaecati corrupti aspernatur a. ”  
-              </p>  
-
-              <h3 className="mt-6 text-lg font-medium text-blue-500">Mia Brown</h3>  
-              <p className="text-gray-600 dark:text-gray-300">Marketing Manager at Stech</p>  
-
-              <div className="flex items-center justify-between mt-12 lg:justify-start">  
-                <button  
-                  title="left arrow"  
-                  className="p-2 text-gray-800 transition-colors duration-300 border rounded-full rtl:-scale-x-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 hover:bg-gray-100"  
-                >  
-                  <svg  
-                    xmlns="http://www.w3.org/2000/svg"  
-                    className="w-6 h-6"  
-                    fill="none"  
-                    viewBox="0 0 24 24"  
-                    stroke="currentColor"  
-                    strokeWidth="2"  
-                  >  
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />  
-                  </svg>  
-                </button>  
-
-                <button  
-                  title="right arrow"  
-                  className="p-2 text-gray-800 transition-colors duration-300 border rounded-full rtl:-scale-x-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 lg:mx-6 hover:bg-gray-100"  
-                >  
-                  <svg  
-                    xmlns="http://www.w3.org/2000/svg"  
-                    className="w-6 h-6"  
-                    fill="none"  
-                    viewBox="0 0 24 24"  
-                    stroke="currentColor"  
-                    strokeWidth="2"  
-                  >  
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />  
-                  </svg>  
-                </button>  
-              </div>  
+          {loading ? (  
+            <div className="text-center">  
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>  
+              <p className="text-gray-500">Loading recipes...</p>  
             </div>  
-          </div>  
+          ) : error ? (  
+            <p className="text-center text-red-500">{error}</p>  
+          ) : recipes.length === 0 ? (  
+            <p className="text-center text-gray-500">No recipes available.</p>  
+          ) : (  
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Reduced gap */}  
+              {recipes.map((recipe) => (  
+                <div key={recipe._id} className="recipe-card bg-white dark:bg-gray-700 p-4 rounded-lg shadow-lg overflow-hidden"> {/* Adjusted padding */}  
+                  <img  
+                    src={`http://localhost:5000/${recipe.imagePath}`}  
+                    alt={recipe.recipeName}  
+                    className="w-full h-48 object-cover rounded-lg"  
+                  />  
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white mt-4">{recipe.recipeName}</h3>  
+                  <p className="text-gray-600 dark:text-gray-300 mt-2 line-clamp-3">  
+                    {recipe.description}  
+                  </p>  
+                </div>  
+              ))}  
+            </div>  
+          )}  
         </div>  
       </section>  
     </div>  

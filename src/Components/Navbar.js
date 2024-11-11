@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useContext, useEffect } from "react";
 import Logo from "../Assets/Logo.png";
-import { BsCart2 } from "react-icons/bs";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -23,11 +22,10 @@ import 'react-toastify/dist/ReactToastify.css';
 const Navbar = () => {
   const { logout } = useContext(AuthContext); 
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
-  const [openMenu, setOpenMenu] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false); // Corrected to setOpenMenu
   const navigate = useNavigate();
 
   useEffect(() => {
-    
     const token = localStorage.getItem("token");
     setIsAuthenticated(!!token); 
   }, []);
@@ -37,17 +35,21 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("fname");
-    localStorage.removeItem("lname"); 
+    localStorage.removeItem("phone"); 
     setIsAuthenticated(false); 
     toast.success("Logout successful!");
     navigate('/'); 
   };
 
+  // Corrected the toggleDrawer function to use setOpenMenu
+  const toggleDrawer = (open) => () => setOpenMenu(open);
+
   const menuOptions = [
-    { text: "Home", icon: <HomeIcon /> },
-    { text: "About", icon: <InfoIcon /> },
-    { text: "Testimonials", icon: <CommentRoundedIcon /> },
-    { text: "Contact", icon: <PhoneRoundedIcon /> },
+    { text: "Home", icon: <HomeIcon />, link: "/" },
+    {text: "Recipes",icon: <HomeIcon/>,link: "/recipes"},
+    { text: "About", icon: <InfoIcon />, link: "/about" },
+    { text: "Profile", icon: <CommentRoundedIcon />, link: "/profile" },
+    { text: "Contact", icon: <PhoneRoundedIcon />, link: "/contact" },
   ];
 
   return (
@@ -56,11 +58,9 @@ const Navbar = () => {
         <img src={Logo} alt="Logo" />
       </div>
       <div className="navbar-links-container">
-        <a href="/">Home</a>
-        <a href="/recipes">Recipes</a>
-        <a href="/profile">Profile</a>
-        <a href="/about">About</a>
-        <a href="/contact">Contact</a>
+        {menuOptions.map((item) => (
+          <Link to={item.link} key={item.text}>{item.text}</Link>
+        ))}
         {isAuthenticated ? (
           <button className="primary-button" onClick={handleLogout}>Logout</button>
         ) : (
@@ -70,22 +70,19 @@ const Navbar = () => {
         )}
       </div>
       <div className="navbar-menu-container">
-        <HiOutlineBars3 onClick={() => setOpenMenu(true)} />
+        <HiOutlineBars3 onClick={toggleDrawer(true)} />
       </div>
-      <Drawer open={openMenu} onClose={() => setOpenMenu(false)} anchor="right">
-        <Box
-          sx={{ width: 250 }}
-          role="presentation"
-          onClick={() => setOpenMenu(false)}
-          onKeyDown={() => setOpenMenu(false)}
-        >
+      <Drawer open={openMenu} onClose={toggleDrawer(false)} anchor="right">
+        <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
           <List>
             {menuOptions.map((item) => (
               <ListItem key={item.text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
+                <Link to={item.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <ListItemButton>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.text} />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             ))}
           </List>
