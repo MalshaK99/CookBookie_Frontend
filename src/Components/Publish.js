@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom"; // Add useNavigate hook for redirection
 import "react-toastify/dist/ReactToastify.css";
 
 const Publish = () => {
@@ -9,6 +10,17 @@ const Publish = () => {
     description: "",
   });
   const [file, setFile] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
+  // Check if the user is logged in when the component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // Redirect to login if no token is found
+
+      toast.error("You need to log in to publish a recipe.");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -31,7 +43,7 @@ const Publish = () => {
 
     // Append the image file
     if (file) {
-      data.append("image", file); 
+      data.append("image", file);
     }
 
     try {
@@ -118,7 +130,7 @@ const Publish = () => {
             <div className="sm:col-span-9">
               <input
                 type="file"
-                name="image" 
+                name="image"
                 id="image"
                 onChange={handleFileChange}
                 className="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 file:bg-gray-50 file:border-0 file:bg-gray-100 file:py-2 file:px-4 dark:file:bg-neutral-700 dark:file:text-neutral-400"
@@ -151,7 +163,7 @@ const Publish = () => {
             type="submit"
             className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-yellow-600 text-white hover:bg-yellow-700 disabled:opacity-50 disabled:pointer-events-none"
           >
-            Submit Advertisement
+            Submit Recipe
           </button>
         </form>
       </div>

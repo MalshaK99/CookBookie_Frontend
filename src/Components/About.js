@@ -4,6 +4,9 @@ import RecipeBg from "../Assets/recipe_bg.png";
 import RateRecipes from "../Assets/choose-image.png";
 import search from "../Assets/search.png";
 import Navbar from "./Navbar";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const Work = () => {
   const workInfoData = [
     {

@@ -53,7 +53,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav>
+    <nav><ToastContainer/>
       <div className="nav-logo-container">
         <img src={Logo} alt="Logo" />
       </div>

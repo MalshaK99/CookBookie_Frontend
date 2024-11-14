@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import RecipeBg2 from "../Assets/loginpage.jpg"; // Assuming you might use this somewhere
 import FormElementsSearchRoundedBaseBasic from "./SearchBar"; // Import the Search Bar component
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const About = () => {
   const [recipes, setRecipes] = useState([]);

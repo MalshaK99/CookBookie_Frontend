@@ -29,7 +29,7 @@ export default function SideNavigationBasic() {
   };
 
   return (
-    <>
+    <><ToastContainer/>
       {/* <!-- Component: Basic side navigation menu --> */}
       {/* <!-- Mobile trigger --> */}
       <button

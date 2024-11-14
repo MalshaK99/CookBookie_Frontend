@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast,ToastContainer } from "react-toastify";
 import chef from "../Assets/chef-uniform.png";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState({
@@ -10,49 +12,76 @@ export default function ProfilePage() {
     email: "",
     currentPassword: "",
     newPassword: "",
+    photo: "",
   });
 
   const [profileImage, setProfileImage] = useState(chef);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate(); // for redirection
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("You must be logged in to access this page.");
+      navigate("/login"); // Redirect to login page
+      return;
+    }
+
     const fetchUserDetails = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const response = await axios.get("http://localhost:5000/api/users/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setUserData({
-            fname: response.data.fname,
-            phone: response.data.phone,
-            email: response.data.email,
-            currentPassword: "",
-            newPassword: "",
-          });
-        } else {
-          toast.error("Token not found. Please log in.");
-        }
+        const response = await axios.get("http://localhost:5000/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const imagePath = response.data.photo
+          ? `http://localhost:5000/${response.data.photo.replace(/\\/g, "/")}`
+          : chef;
+
+        setUserData({
+          fname: response.data.fname,
+          phone: response.data.phone,
+          email: response.data.email,
+          currentPassword: "",
+          newPassword: "",
+          photo: imagePath,
+        });
+
+        setProfileImage(imagePath); // Set the profile image
       } catch (error) {
-        toast.error(
-          error.response?.data?.message || "Failed to fetch user details."
-        );
+        toast.error(error.response?.data?.message || "Failed to fetch user details.");
       }
     };
 
     fetchUserDetails();
-  }, []);
+  }, [navigate]);
 
   const handleImageClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleImageChange = (event) => {
+  const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
-      // Optionally upload the file here
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.put("http://localhost:5000/api/users/update-profile-pic", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const imageUrl = URL.createObjectURL(file); // Show selected image immediately
+        setProfileImage(imageUrl);
+
+        toast.success("Profile photo updated successfully");
+      } catch (error) {
+        toast.error("Failed to upload profile picture.");
+      }
     }
   };
 
@@ -85,9 +114,7 @@ export default function ProfilePage() {
       });
       toast.success("User details updated successfully!");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to update user details."
-      );
+      toast.error(error.response?.data?.message || "Failed to update user details.");
     }
   };
 
@@ -112,14 +139,12 @@ export default function ProfilePage() {
       toast.success("Password updated successfully!");
       setUserData((prevData) => ({ ...prevData, currentPassword: "", newPassword: "" }));
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to update password."
-      );
+      toast.error(error.response?.data?.message || "Failed to update password.");
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <div className="max-w-3xl mx-auto p-6 space-y-8"><ToastContainer/>
       {/* Personal Details Form */}
       <form onSubmit={handleDetailsSubmit} className="border-b border-gray-300 pb-8">
         <div className="text-center">
@@ -216,7 +241,7 @@ export default function ProfilePage() {
         </div>
         <div className="mt-6 flex justify-end">
           <button type="submit" className="rounded-md bg-yellow-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus:ring-2 focus:ring-yellow-500">
-            Update Password
+            Change Password
           </button>
         </div>
       </form>

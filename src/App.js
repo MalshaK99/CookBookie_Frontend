@@ -13,11 +13,13 @@ import SignUp from "./Components/Signup";
  import PublishPage from "./Pages/PubishPage";
  import HistoryPage from "./Pages/HistoryPage";
  import Review_ratings from './Components/ReviewRatings'
+ import { toast,ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <Router>
       <div className="App">
-      
+<ToastContainer/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
