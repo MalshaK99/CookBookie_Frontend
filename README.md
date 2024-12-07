@@ -1,2 +1,24 @@
 # CookBookie-Frontend
-This is the frontend of a recipe sharing platform developed using React.
+
+Overview
+
+This repository contains the front-end development for the CookBookie recipe-sharing platform. 
+
+Technologies Used
+
+Web Application Development: MERN Stack (MongoDB, Express.js, React, Node.js)
+
+Testing Framework: Selenium with Java
+
+GitHub Repositories
+
+Backend Repository: https://github.com/MalshaK99/CookBookie_backend
+
+Automated Testing Repository: https://github.com/MalshaK99/CookBookie_Test
+
+
+YouTube Videos
+
+Testing Video: [Link to Testing Video]
+
+Web Application Video: https://youtu.be/dD_bfRUtM_w?feature=shared
